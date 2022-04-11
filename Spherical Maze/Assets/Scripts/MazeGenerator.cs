@@ -44,11 +44,33 @@ public class MazeGenerator : MonoBehaviour
         m_visitedCount++;
 
         CalculateMaze();
-        UpdateVisuals();
+        for (int x = 0; x < m_mazeWidth; x++)
+        {
+            for (int y = 0; y < m_mazeHeight; y++)
+            {
+                UpdateVisuals(x, y);
+            }
+        }
+        m_mazeVisuals[0, 0].m_tile.GetComponent<Renderer>().material.color = Color.green;
+        m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.GetComponent<Renderer>().material.color = Color.red;
     }
 
+    //private void Update()
+    //{
+    //    CalculateMaze();
+    //    UpdateVisuals((int)m_path.Peek().x, (int)m_path.Peek().y);
+    //    UpdateVisuals((int)m_path.Peek().x + 0, (int)m_path.Peek().y + 1);
+    //    UpdateVisuals((int)m_path.Peek().x + 0, (int)m_path.Peek().y + -1);
+    //    UpdateVisuals((int)m_path.Peek().x + 1, (int)m_path.Peek().y + 0);
+    //    UpdateVisuals((int)m_path.Peek().x + -1, (int)m_path.Peek().y + 0);
+
+    //    m_mazeVisuals[0, 0].m_tile.GetComponent<Renderer>().material.color = Color.green;
+    //    m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.GetComponent<Renderer>().material.color = Color.red;
+    //}
+
     void CalculateMaze()
-    {
+    { 
+        //if (m_visitedCount<m_mazeWidth* m_mazeHeight)
         while (m_visitedCount < m_mazeWidth * m_mazeHeight)
         {
             List<char> neighbours = new List<char>();
@@ -127,58 +149,59 @@ public class MazeGenerator : MonoBehaviour
         }
     }
 
-    void UpdateVisuals()
+    void UpdateVisuals(int a_x, int a_y)
     {
-        for (int x = 0; x < m_mazeWidth; x++)
+        if (a_x >= 0 && a_x < m_mazeWidth && a_y >= 0 && a_y < m_mazeHeight)
         {
-            for (int y = 0; y < m_mazeHeight; y++)
+            Destroy(m_mazeVisuals[a_x, a_y].m_tile);
+            m_mazeVisuals[a_x, a_y].m_tile = null;
+
+            for (int i = 0; i < m_mazeVisuals[a_x, a_y].m_walls.Length; i++)
             {
-                Destroy(m_mazeVisuals[x, y].m_tile);
-                m_mazeVisuals[x, y].m_tile = null;
-                for (int i = 0; i < m_mazeVisuals[x, y].m_walls.Length; i++)
-                {
-                    Destroy(m_mazeVisuals[x, y].m_walls[i]);
-                    m_mazeVisuals[x, y].m_walls[i] = null;
-                }
+                Destroy(m_mazeVisuals[a_x, a_y].m_walls[i]);
+                m_mazeVisuals[a_x, a_y].m_walls[i] = null;
+            }
 
-                m_mazeVisuals[x, y].m_tile = Instantiate(m_tilePrefab, new Vector3(x, 0, y), Quaternion.identity);
-                if (m_maze[x, y].m_visited)
-                {
-                    m_mazeVisuals[x, y].m_tile.GetComponent<Renderer>().material.color = Color.white;
-                }
-                else
-                {
-                    m_mazeVisuals[x, y].m_tile.GetComponent<Renderer>().material.color = Color.blue;
-                }
-                if (!m_maze[x, y].m_northPath || y == m_mazeHeight)
-                {
-                    m_mazeVisuals[x, y].m_walls[0] = Instantiate(m_wallPrefab, new Vector3(x, 0.5f, y), Quaternion.identity);
-                    m_mazeVisuals[x, y].m_walls[0].transform.Rotate(new Vector3(0, 0, 0));
-                    m_mazeVisuals[x, y].m_walls[0].GetComponentInChildren<Renderer>().material.color = Color.black;
+            m_mazeVisuals[a_x, a_y].m_tile = Instantiate(m_tilePrefab, new Vector3(a_x, 0, a_y), Quaternion.identity);
+            m_mazeVisuals[a_x, a_y].m_tile.transform.parent = this.gameObject.transform;
+            if (m_maze[a_x, a_y].m_visited)
+            {
+                m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.color = Color.white;
+            }
+            else
+            {
+                m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.color = Color.blue;
+            }
+            if (!m_maze[a_x, a_y].m_northPath || a_y == m_mazeHeight)
+            {
+                m_mazeVisuals[a_x, a_y].m_walls[0] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
+                m_mazeVisuals[a_x, a_y].m_walls[0].transform.Rotate(new Vector3(0, 0, 0));
+                m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.color = Color.black;
+                m_mazeVisuals[a_x, a_y].m_walls[0].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
 
-                }
-                if (!m_maze[x, y].m_eastPath || x == m_mazeWidth)
-                {
-                    m_mazeVisuals[x, y].m_walls[1] = Instantiate(m_wallPrefab, new Vector3(x, 0.5f, y), Quaternion.identity);
-                    m_mazeVisuals[x, y].m_walls[1].transform.Rotate(new Vector3(0, 90, 0));
-                    m_mazeVisuals[x, y].m_walls[1].GetComponentInChildren<Renderer>().material.color = Color.black;
-                }
-                if (!m_maze[x, y].m_southPath || y == 0)
-                {
-                    m_mazeVisuals[x, y].m_walls[2] = Instantiate(m_wallPrefab, new Vector3(x, 0.5f, y), Quaternion.identity);
-                    m_mazeVisuals[x, y].m_walls[2].transform.Rotate(new Vector3(0, 180, 0));
-                    m_mazeVisuals[x, y].m_walls[2].GetComponentInChildren<Renderer>().material.color = Color.black;
-                }
-                if (!m_maze[x, y].m_westPath || x == 0)
-                {
-                    m_mazeVisuals[x, y].m_walls[3] = Instantiate(m_wallPrefab, new Vector3(x, 0.5f, y), Quaternion.identity);
-                    m_mazeVisuals[x, y].m_walls[3].transform.Rotate(new Vector3(0, 270, 0));
-                    m_mazeVisuals[x, y].m_walls[3].GetComponentInChildren<Renderer>().material.color = Color.black;
-                }
+            }
+            if (!m_maze[a_x, a_y].m_eastPath || a_x == m_mazeWidth)
+            {
+                m_mazeVisuals[a_x, a_y].m_walls[1] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
+                m_mazeVisuals[a_x, a_y].m_walls[1].transform.Rotate(new Vector3(0, 90, 0));
+                m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.color = Color.black;
+                m_mazeVisuals[a_x, a_y].m_walls[1].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
+            }
+            if (!m_maze[a_x, a_y].m_southPath || a_y == 0)
+            {
+                m_mazeVisuals[a_x, a_y].m_walls[2] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
+                m_mazeVisuals[a_x, a_y].m_walls[2].transform.Rotate(new Vector3(0, 180, 0));
+                m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.color = Color.black;
+                m_mazeVisuals[a_x, a_y].m_walls[2].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
+            }
+            if (!m_maze[a_x, a_y].m_westPath || a_x == 0)
+            {
+                m_mazeVisuals[a_x, a_y].m_walls[3] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
+                m_mazeVisuals[a_x, a_y].m_walls[3].transform.Rotate(new Vector3(0, 270, 0));
+                m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.color = Color.black;
+                m_mazeVisuals[a_x, a_y].m_walls[3].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
             }
         }
-        m_mazeVisuals[0, 0].m_tile.GetComponent<Renderer>().material.color = Color.green;
-        m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.GetComponent<Renderer>().material.color = Color.red;
     }
 
     void AjustCamera(int a_lowestX, int a_highestX, int a_lowestY, int a_highestY)
