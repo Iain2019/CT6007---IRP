@@ -37,7 +37,7 @@ public class MazeGenerator : MonoBehaviour
                 m_mazeVisuals[x, y] = new CellVisuals();
             }
         }
-        AjustCamera(0, m_mazeWidth, 0, m_mazeHeight);
+        //AjustCamera(0, m_mazeWidth, 0, m_mazeHeight);
 
         m_path.Push(new Vector2(0, 0));
         m_maze[0, 0].m_visited = true;
