@@ -7,26 +7,33 @@ public class MazeGenerator : MonoBehaviour
     //Serialized Fields
         //Maze
     [SerializeField]
-    private int m_mazeWidth = 0;
+    int m_mazeWidth = 0;
     [SerializeField]
-    private int m_mazeHeight = 0;
+    int m_mazeHeight = 0;
         //Prefabs
     [SerializeField]
     GameObject m_tilePrefab;
     [SerializeField]
     GameObject m_wallPrefab;
+    [SerializeField]
+    GameObject m_playerPrefab;
 
     //Private Variables
         //Maze
-    Cell[,] m_maze;
-    int m_visitedCount = 0;
-    Stack<Vector2> m_path = new Stack<Vector2>();
+    private Cell[,] m_maze;
+    private int m_visitedCount = 0;
+    private Stack<Vector2> m_path = new Stack<Vector2>();
         //Maze Visuals
-    public CellVisuals[,] m_mazeVisuals;
+    private CellVisuals[,] m_mazeVisuals;
 
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
+        if (GameObject.Find("PersistentInfo") != null)
+        {
+            m_mazeWidth = PersistentInfo.Instance.m_MazeWidth;
+            m_mazeHeight = PersistentInfo.Instance.m_MazeHeight;
+        }
         m_maze = new Cell[m_mazeWidth, m_mazeHeight];
         m_mazeVisuals = new CellVisuals[m_mazeWidth, m_mazeHeight];
         for (int x = 0; x < m_mazeWidth; x++)
@@ -51,8 +58,11 @@ public class MazeGenerator : MonoBehaviour
                 UpdateVisuals(x, y);
             }
         }
-        m_mazeVisuals[0, 0].m_tile.GetComponent<Renderer>().material.color = Color.green;
-        m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.GetComponent<Renderer>().material.color = Color.red;
+        m_mazeVisuals[0, 0].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.green);
+        GameObject player = Instantiate(m_playerPrefab, m_mazeVisuals[0, 0].m_tile.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
+        m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.red);
+        m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.transform.GetChild(0).gameObject.SetActive(true);
+        m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.transform.GetChild(0).gameObject.GetComponent<EndPoint>().m_player = player;
     }
 
     //private void Update()
@@ -163,20 +173,27 @@ public class MazeGenerator : MonoBehaviour
             }
 
             m_mazeVisuals[a_x, a_y].m_tile = Instantiate(m_tilePrefab, new Vector3(a_x, 0, a_y), Quaternion.identity);
+            //m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetVector("_Centre", new Vector4(m_mazeWidth / 2, 0.0f, m_mazeHeight / 2, 0.0f));
+            m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetFloat("_Width", m_mazeWidth);
+            m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetFloat("_Height", m_mazeHeight);
             m_mazeVisuals[a_x, a_y].m_tile.transform.parent = this.gameObject.transform;
             if (m_maze[a_x, a_y].m_visited)
             {
-                m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.color = Color.white;
+                m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.white);
             }
             else
             {
-                m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.color = Color.blue;
+                m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.blue);
             }
+
             if (!m_maze[a_x, a_y].m_northPath || a_y == m_mazeHeight)
             {
                 m_mazeVisuals[a_x, a_y].m_walls[0] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
                 m_mazeVisuals[a_x, a_y].m_walls[0].transform.Rotate(new Vector3(0, 0, 0));
-                m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.color = Color.black;
+                //m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetVector("_Centre", new Vector4(m_mazeWidth / 2, 0.0f, m_mazeHeight / 2, 0.0f));
+                m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
+                m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
+                m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
                 m_mazeVisuals[a_x, a_y].m_walls[0].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
 
             }
@@ -184,21 +201,30 @@ public class MazeGenerator : MonoBehaviour
             {
                 m_mazeVisuals[a_x, a_y].m_walls[1] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
                 m_mazeVisuals[a_x, a_y].m_walls[1].transform.Rotate(new Vector3(0, 90, 0));
-                m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.color = Color.black;
+                //m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetVector("_Centre", new Vector4(m_mazeWidth / 2, 0.0f, m_mazeHeight / 2, 0.0f));
+                m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
+                m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
+                m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
                 m_mazeVisuals[a_x, a_y].m_walls[1].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
             }
             if (!m_maze[a_x, a_y].m_southPath || a_y == 0)
             {
                 m_mazeVisuals[a_x, a_y].m_walls[2] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
                 m_mazeVisuals[a_x, a_y].m_walls[2].transform.Rotate(new Vector3(0, 180, 0));
-                m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.color = Color.black;
+                //m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetVector("_Centre", new Vector4(m_mazeWidth / 2, 0.0f, m_mazeHeight / 2, 0.0f));
+                m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
+                m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
+                m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
                 m_mazeVisuals[a_x, a_y].m_walls[2].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
             }
             if (!m_maze[a_x, a_y].m_westPath || a_x == 0)
             {
                 m_mazeVisuals[a_x, a_y].m_walls[3] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
                 m_mazeVisuals[a_x, a_y].m_walls[3].transform.Rotate(new Vector3(0, 270, 0));
-                m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.color = Color.black;
+                //m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetVector("_Centre", new Vector4(m_mazeWidth / 2, 0.0f, m_mazeHeight / 2, 0.0f));
+                m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
+                m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
+                m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
                 m_mazeVisuals[a_x, a_y].m_walls[3].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
             }
         }
@@ -227,7 +253,7 @@ public class MazeGenerator : MonoBehaviour
     }
 }
 
-public class Cell : MonoBehaviour
+public class Cell
 {
     //Public Variables
     public bool m_visited = false;
