@@ -4,7 +4,7 @@
     {
         _MainTex("BaseMap", 2D) = "" {}
         _BaseColour ("BaseColour", Color) = (0.1, 0.1, 0.1, 1)
-        _Curvature("Curvature", Range(-0.1, 0.1)) = 0.0
+        _Curvature("Curvature", Range(-0.2, 0.2)) = 0.0
     }
     SubShader
     {
@@ -54,6 +54,7 @@
                 
                 o.vertex.y += result;
 
+                o.vertex = normalize(o.vertex);
                 return o;
             }
 

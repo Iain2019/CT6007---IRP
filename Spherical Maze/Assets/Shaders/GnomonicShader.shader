@@ -4,7 +4,9 @@
     {
         _MainTex("BaseMap", 2D) = "" {}
         _BaseColour("BaseColour", Color) = (0.1, 0.1, 0.1, 1)
-        _Centre("Centre", Vector) = (2.5, 2.5, 0, 0)
+        //_Centre("Centre", Vector) = (2.5, 2.5, 0, 0)
+        //_Width("Width", float) = 0.0
+        //_Height("Height", float) = 0.0
     }
         SubShader
         {
@@ -37,7 +39,8 @@
                 sampler2D _MainTex;
                 float4 _MainTex_ST;
                 float4 _BaseColour;
-                vector _Centre;
+                float _Width;
+                float _Height;
 
                 v2f vert(appdata v)
                 {
@@ -49,8 +52,6 @@
                     float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
                     float3 posToCam = _WorldSpaceCameraPos - worldPos;
 
-                    //float3 posToCentre = _Centre.xyz - worldPos;
-                    //float3 centreToCam = _WorldSpaceCameraPos - posToCentre;
 
                     float xSquared = worldPos.x * worldPos.x;
                     float zSquared = worldPos.z * worldPos.z;
@@ -60,11 +61,16 @@
                     float yPos = (2 * worldPos.z) / denominator;
                     float zPos = (1 - xSquared - zSquared) / denominator;
 
-                    o.vertex.x *= xPos;
-                    o.vertex.y *= yPos;
-                    o.vertex.z *= zPos;
+                    float xPosG = xPos / yPos;
+                    float yPosG = yPos;
+                    float zPosG = zPos / yPos;
+
+                    o.vertex.x += xPosG;
+                    o.vertex.y += yPosG;
+                    o.vertex.z += zPosG;
                     o.vertex.w = 1;
 
+                    o.vertex = normalize(o.vertex);
                     return o;
                 }
 

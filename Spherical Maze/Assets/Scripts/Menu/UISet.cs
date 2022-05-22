@@ -12,7 +12,8 @@ public class UISet : MonoBehaviour
         MUSIC_TOGGLE,
         FOV,
         WIDTH,
-        HEIGHT
+        HEIGHT,
+        SUBDIVISION
     }
 
     [SerializeField]
@@ -45,6 +46,9 @@ public class UISet : MonoBehaviour
                 break;
             case TYPE.HEIGHT:
                 GetComponent<UnityEngine.UI.Text>().text = PersistentInfo.Instance.m_MazeHeight.ToString();
+                break;
+            case TYPE.SUBDIVISION:
+                GetComponent<UnityEngine.UI.Text>().text = PersistentInfo.Instance.m_Subdivision.ToString();
                 break;
         }
     }

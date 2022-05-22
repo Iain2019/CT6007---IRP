@@ -10,9 +10,13 @@ public class MenuButtons : MonoBehaviour
     [SerializeField]
     GameObject m_mainPanel;
     [SerializeField]
-    GameObject m_sphericalPanel;
+    GameObject m_stereographicPanel;
+    [SerializeField]
+    GameObject m_gnomonicPanel;
     [SerializeField]
     GameObject m_hyperbolicPanel;
+    [SerializeField]
+    GameObject m_curvedPanel;
     [SerializeField]
     GameObject m_optionsPanel;
         //Options Menu Buttons
@@ -20,15 +24,25 @@ public class MenuButtons : MonoBehaviour
     GameObject m_FOVText;
 
     //Main Menu Buttons
-    public void OnSphericalButton()
+    public void OnStereographicButton()
     {
         m_mainPanel.SetActive(false);
-        m_sphericalPanel.SetActive(true);
+        m_stereographicPanel.SetActive(true);
+    }
+    public void OnGnomonicButton()
+    {
+        m_mainPanel.SetActive(false);
+        m_gnomonicPanel.SetActive(true);
     }
     public void OnHyperbolicButton()
     {
         m_mainPanel.SetActive(false);
         m_hyperbolicPanel.SetActive(true);
+    }
+    public void OnCurvedButton()
+    {
+        m_mainPanel.SetActive(false);
+        m_curvedPanel.SetActive(true);
     }
     public void OnOptionsButton()
     {
@@ -49,18 +63,32 @@ public class MenuButtons : MonoBehaviour
     {
         PersistentInfo.Instance.m_MazeHeight = int.Parse(a_input.text);
     }
+    public void OnSubdivisionInput(UnityEngine.UI.InputField a_input)
+    {
+        PersistentInfo.Instance.m_Subdivision = int.Parse(a_input.text);
+    }
     public void OnStartButton(int a_sceneIndex)
     {
         SceneManager.LoadScene(a_sceneIndex);
     }
-    public void OnSphericalBackButton()
+    public void OnStereographicBackButton()
     {
-        m_sphericalPanel.SetActive(false);
+        m_stereographicPanel.SetActive(false);
+        m_mainPanel.SetActive(true);
+    }
+    public void OnGnomonicBackButton()
+    {
+        m_gnomonicPanel.SetActive(false);
         m_mainPanel.SetActive(true);
     }
     public void OnHyperbolicBackButton()
     {
         m_hyperbolicPanel.SetActive(false);
+        m_mainPanel.SetActive(true);
+    }
+    public void OnCurvedBackButton()
+    {
+        m_curvedPanel.SetActive(false);
         m_mainPanel.SetActive(true);
     }
 

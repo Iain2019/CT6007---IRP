@@ -12,6 +12,8 @@ class PersistentInfo : MonoBehaviour
     public float m_FOV { get; set; }
     public int m_MazeWidth { get; set; }
     public int m_MazeHeight { get; set; }
+    public int m_Subdivision { get; set; }
+
 
     public static PersistentInfo Instance { set; get; }
     void Awake()
@@ -19,13 +21,7 @@ class PersistentInfo : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            m_soundToggle = true;
-            m_Sound = 100;
-            m_musicToggle = true;
-            m_Music = 100;
-            m_FOV = 60;
-            m_MazeWidth = 5;
-            m_MazeHeight = 5;
+            Clear();
         }
     }
     public void Clear()
@@ -37,5 +33,6 @@ class PersistentInfo : MonoBehaviour
         m_FOV = 60;
         m_MazeWidth = 5;
         m_MazeHeight = 5;
+        m_Subdivision = 3;
     }
 }
