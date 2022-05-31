@@ -55,6 +55,7 @@ public class MazeGenerator : MonoBehaviour
         m_visitedCount++;
 
         CalculateMaze();
+        this.transform.position = new Vector3(-(m_mazeWidth / 2), transform.position.y, -(m_mazeHeight / 2));
         for (int x = 0; x < m_mazeWidth; x++)
         {
             for (int y = 0; y < m_mazeHeight; y++)
@@ -91,7 +92,7 @@ public class MazeGenerator : MonoBehaviour
     //}
 
     void CalculateMaze()
-    { 
+    {
         //if (m_visitedCount<m_mazeWidth* m_mazeHeight)
         while (m_visitedCount < m_mazeWidth * m_mazeHeight)
         {
@@ -203,7 +204,7 @@ public class MazeGenerator : MonoBehaviour
                 m_mazeVisuals[a_x, a_y].m_walls[0].transform.Rotate(new Vector3(0, 0, 0));
                 m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
                 m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
-                m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
+                m_mazeVisuals[a_x, a_y].m_walls[0].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.grey);
                 m_mazeVisuals[a_x, a_y].m_walls[0].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
 
             }
@@ -213,7 +214,7 @@ public class MazeGenerator : MonoBehaviour
                 m_mazeVisuals[a_x, a_y].m_walls[1].transform.Rotate(new Vector3(0, 90, 0));
                 m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
                 m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
-                m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
+                m_mazeVisuals[a_x, a_y].m_walls[1].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.grey);
                 m_mazeVisuals[a_x, a_y].m_walls[1].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
             }
             if (!m_maze[a_x, a_y].m_southPath || a_y == 0)
@@ -222,7 +223,7 @@ public class MazeGenerator : MonoBehaviour
                 m_mazeVisuals[a_x, a_y].m_walls[2].transform.Rotate(new Vector3(0, 180, 0));
                 m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
                 m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
-                m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
+                m_mazeVisuals[a_x, a_y].m_walls[2].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.grey);
                 m_mazeVisuals[a_x, a_y].m_walls[2].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
             }
             if (!m_maze[a_x, a_y].m_westPath || a_x == 0)
@@ -231,7 +232,7 @@ public class MazeGenerator : MonoBehaviour
                 m_mazeVisuals[a_x, a_y].m_walls[3].transform.Rotate(new Vector3(0, 270, 0));
                 m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetFloat("_Width", m_mazeWidth);
                 m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetFloat("_Height", m_mazeHeight);
-                m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.black);
+                m_mazeVisuals[a_x, a_y].m_walls[3].GetComponentInChildren<Renderer>().material.SetColor("_BaseColour", Color.grey);
                 m_mazeVisuals[a_x, a_y].m_walls[3].transform.parent = m_mazeVisuals[a_x, a_y].m_tile.transform;
             }
         }

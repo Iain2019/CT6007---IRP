@@ -737,7 +737,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_curvature: 0
   m_tileColour: {r: 1, g: 1, b: 1, a: 1}
-  m_wallColour: {r: 0, g: 0, b: 0, a: 1}
+  m_wallColour: {r: 0.5, g: 0.5, b: 0.5, a: 1}
 --- !u!1 &1193053555
 GameObject:
   m_ObjectHideFlags: 0

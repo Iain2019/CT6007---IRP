@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0ab5630d029e93342ab8dd352bbe8e5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_boundsScale: 100000
+  m_boundsScale: 1000
   m_subdivisions: 3
 --- !u!1 &61097888029211812
 GameObject:

@@ -4,6 +4,7 @@
     {
         _MainTex("BaseMap", 2D) = "" {}
         _BaseColour("BaseColour", Color) = (0.1, 0.1, 0.1, 1)
+        _Radius("Radius", Float) = 1.0
     }
     SubShader
     {
@@ -36,8 +37,7 @@
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _BaseColour;
-            float _Width;
-            float _Height;
+            float _Radius;
 
             v2f vert (appdata v)
             {
@@ -52,10 +52,18 @@
                 float xSquared = posToCam.x * posToCam.x;
                 float zSquared = posToCam.z * posToCam.z;
 
-                float denominator = 1 + xSquared + zSquared;
-                float xPos = (2 * posToCam.x) / denominator;
-                float yPos = (2 * posToCam.z) / denominator;
-                float zPos = (1 - xSquared - zSquared) / denominator;
+                //float denominator = 1 + xSquared + zSquared;
+                //float xPos = (2 * posToCam.x) / denominator;
+                //float yPos = (2 * posToCam.z) / denominator;
+                //float zPos = (1 - xSquared - zSquared) / denominator;
+
+                float rPlusz = xSquared + zSquared;
+                float result = rPlusz + 1;
+                float root = sqrt((_Radius * result) - (rPlusz));
+
+                float xPos = ((1 + root) * posToCam.x / result);
+                float yPos = ((1 + root) * posToCam.z / result);
+                float zPos = ((1 + root) / result);
 
                 o.vertex.x = xPos;
                 o.vertex.y = yPos;
