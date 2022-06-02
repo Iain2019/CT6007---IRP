@@ -5,6 +5,7 @@ using UnityEngine;
 
 class PersistentInfo : MonoBehaviour
 {
+    //Variables to store between scenes
     public bool m_soundToggle { get; set; }
     public float m_Sound { get; set; }
     public bool m_musicToggle { get; set; }
@@ -26,6 +27,7 @@ class PersistentInfo : MonoBehaviour
     }
     public void Clear()
     {
+        //set default
         m_soundToggle = true;
         m_Sound = 100;
         m_musicToggle = true;

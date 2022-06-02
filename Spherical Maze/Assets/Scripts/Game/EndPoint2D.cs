@@ -21,8 +21,10 @@ public class EndPoint2D : MonoBehaviour
     {
         if (m_InfoCanvas.activeInHierarchy)
         {
+            //if interactable allow input for ending level
             if (Input.GetKeyDown(KeyCode.E))
             {
+                //unlock cursor
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 SceneManager.LoadScene(0);
@@ -30,11 +32,13 @@ public class EndPoint2D : MonoBehaviour
 
             if (Vector3.Distance(transform.position, m_player.transform.position) > m_endDistance)
             {
+                //if player goes out of distance show end UI
                 m_InfoCanvas.SetActive(false);
             }
         }
         else
         {
+            //if player goes into distance show end UI
             if (Vector3.Distance(transform.position, m_player.transform.position) <= m_endDistance)
             {
                 m_InfoCanvas.SetActive(true);

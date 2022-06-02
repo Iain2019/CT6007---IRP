@@ -24,6 +24,7 @@ public class MenuButtons : MonoBehaviour
     GameObject m_FOVText;
 
     //Main Menu Buttons
+    //Toggle menu panles based on buttons
     public void OnStereographicButton()
     {
         m_mainPanel.SetActive(false);
@@ -57,15 +58,51 @@ public class MenuButtons : MonoBehaviour
     //Spherical/Hyperbolic Menu Button
     public void OnWidthInput(UnityEngine.UI.InputField a_input)
     {
-        PersistentInfo.Instance.m_MazeWidth = int.Parse(a_input.text);
+        //check inout is within allowed range
+        if (int.Parse(a_input.text) > 100)
+        {
+            a_input.text = "100";
+        }
+        else if (int.Parse(a_input.text) < 1)
+        {
+            a_input.text = "1";
+        }
+        else
+        {
+            PersistentInfo.Instance.m_MazeWidth = int.Parse(a_input.text);
+        }
     }
     public void OnHeightInput(UnityEngine.UI.InputField a_input)
     {
-        PersistentInfo.Instance.m_MazeHeight = int.Parse(a_input.text);
+        //check inout is within allowed 
+        if (int.Parse(a_input.text) > 100)
+        {
+            a_input.text = "100";
+        }
+        else if (int.Parse(a_input.text) < 1)
+        {
+            a_input.text = "1";
+        }
+        else
+        {
+            PersistentInfo.Instance.m_MazeHeight = int.Parse(a_input.text);
+        }
     }
     public void OnSubdivisionInput(UnityEngine.UI.InputField a_input)
     {
-        PersistentInfo.Instance.m_Subdivision = int.Parse(a_input.text);
+        //check inout is within allowed range
+        if (int.Parse(a_input.text) > 3)
+        {
+            a_input.text = "3";
+        }
+        else if (int.Parse(a_input.text) < 0)
+        {
+            a_input.text = "0";
+        }
+        else
+        {
+            PersistentInfo.Instance.m_Subdivision = int.Parse(a_input.text);
+        }
     }
     public void OnStartButton(int a_sceneIndex)
     {

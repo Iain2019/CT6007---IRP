@@ -2,10 +2,11 @@
 {
     Properties
     {
-        _MainTex("BaseMap", 2D) = "" {}
-        _BaseColour("BaseColour", Color) = (0.1, 0.1, 0.1, 1)
-        _Curvature("Curvature", Range(0, 1)) = 0.0
-        _Radius("Radius", Float) = 1.0
+        //inputs for unity 
+        _MainTex("_BaseMap", 2D) = "" {}
+        _BaseColour("_BaseColour", Color) = (0.1, 0.1, 0.1, 1)
+        _Curvature("_Curvature", Float) = 0.0
+        _Radius("_Radius", Float) = 1.0
     }
     SubShader
     {
@@ -35,6 +36,7 @@
                 float4 vertex : SV_POSITION;
             };
 
+            //inputs for shader
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _BaseColour;
@@ -48,29 +50,38 @@
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 UNITY_TRANSFER_FOG(o, o.vertex);
 
+                //get world pos of vertex
                 float3 worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+                //get pos of vertex from camera
                 float3 posToCam = _WorldSpaceCameraPos - worldPos;
 
+                //sqaure values ahead of time to save on amount of times it needs to be calcuated
+                //due to the large amounts of time calculation is made little makes a difference
                 float xSquared = posToCam.x * posToCam.x;
                 float zSquared = posToCam.z * posToCam.z;
 
+                ////Sereographically project to sphere of radius 1
                 //float denominator = 1 + xSquared + zSquared;
                 //float xPos = (2 * posToCam.x) / denominator;
                 //float yPos = (2 * posToCam.z) / denominator;
                 //float zPos = (1 - xSquared - zSquared) / denominator;
 
+                //calculate recuring values ahead of time to save on amount of times it needs to be calcuated
+                //due to the large amounts of time calculation is made little makes a difference
                 float rPlusz = xSquared + zSquared;
                 float result = rPlusz + 1;
-                float root = sqrt((_Radius * result) - (rPlusz));
+                float root = sqrt(((_Radius * _Radius) * result) - (rPlusz));
 
+                //apply to maths shown in pop up in game / in maths document
                 float xPos = ((1 + root) * posToCam.x / result);
                 float yPos = ((1 + root) * posToCam.z / result);
                 float zPos = ((1 + root) / result) - 1;
 
-                o.vertex.x *= xPos;
-                o.vertex.y *= yPos;
-                o.vertex.z *= zPos;
-                //o.vertex.w = 1;
+                //apply to verticies
+                o.vertex.x = xPos + _Curvature;
+                o.vertex.y = zPos + _Curvature;
+                o.vertex.z = yPos + _Curvature;
+                //o.vertex.w = 1;   
 
                 o.vertex = normalize(o.vertex);
                 return o;

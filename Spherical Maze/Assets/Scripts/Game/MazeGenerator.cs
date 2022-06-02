@@ -33,46 +33,61 @@ public class MazeGenerator : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
+        //check pi
         if (GameObject.Find("PersistentInfo") != null)
         {
+            //set maze size
             m_mazeWidth = PersistentInfo.Instance.m_MazeWidth;
             m_mazeHeight = PersistentInfo.Instance.m_MazeHeight;
         }
+        //set logic and visuals arrays
         m_maze = new Cell[m_mazeWidth, m_mazeHeight];
         m_mazeVisuals = new CellVisuals[m_mazeWidth, m_mazeHeight];
         for (int x = 0; x < m_mazeWidth; x++)
         {
             for (int y = 0; y < m_mazeHeight; y++)
             {
+                //loop through cells and set as defaults
                 m_maze[x, y] = new Cell();
                 m_mazeVisuals[x, y] = new CellVisuals();
             }
         }
+        ////Ajust camera for debugging 
         //AjustCamera(0, m_mazeWidth, 0, m_mazeHeight);
 
+        //push start point to stack
         m_path.Push(new Vector2(0, 0));
+        //set first as visited
         m_maze[0, 0].m_visited = true;
+        //up visted count
         m_visitedCount++;
 
+        //calc maze
         CalculateMaze();
-        this.transform.position = new Vector3(-(m_mazeWidth / 2), transform.position.y, -(m_mazeHeight / 2));
+        //move maze to account for size (0, 0) centre
+        this.transform.position = new Vector3(-((float)m_mazeWidth / 2), transform.position.y, -((float)m_mazeHeight / 2));
         for (int x = 0; x < m_mazeWidth; x++)
         {
             for (int y = 0; y < m_mazeHeight; y++)
             {
+                //update the visuals for the maze
                 UpdateVisuals(x, y);
             }
         }
+        //set specific tiles shader info
         m_mazeVisuals[0, 0].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.green);
         GameObject player = Instantiate(m_playerPrefab, m_mazeVisuals[0, 0].m_tile.transform.position + new Vector3(0, 1, 0), Quaternion.identity);
         m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.red);
+        //show end point UI
         m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.transform.GetChild(0).gameObject.SetActive(true);
         if (m_3D)
         {
+            //set player in end point
             m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.transform.GetChild(0).gameObject.GetComponent<EndPoint3D>().m_player = player;
         }
         else
         {
+            //set player & info canvas for endpoint
             m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.transform.GetChild(0).gameObject.GetComponent<EndPoint2D>().m_player = player;
             m_mazeVisuals[m_mazeWidth - 1, m_mazeHeight - 1].m_tile.transform.GetChild(0).gameObject.GetComponent<EndPoint2D>().m_InfoCanvas = m_infoCanvas;
         }
@@ -80,6 +95,7 @@ public class MazeGenerator : MonoBehaviour
 
     //private void Update()
     //{
+    //    //calculating maze in update for debugging to show sep by step building of maze  
     //    CalculateMaze();
     //    UpdateVisuals((int)m_path.Peek().x, (int)m_path.Peek().y);
     //    UpdateVisuals((int)m_path.Peek().x + 0, (int)m_path.Peek().y + 1);
@@ -93,16 +109,21 @@ public class MazeGenerator : MonoBehaviour
 
     void CalculateMaze()
     {
+        ////for updated veiwing
         //if (m_visitedCount<m_mazeWidth* m_mazeHeight)
+        //if count is within array size
         while (m_visitedCount < m_mazeWidth * m_mazeHeight)
         {
+            //neightbours list for cells arround current one
             List<char> neighbours = new List<char>();
 
             //Check Northern Neighbour
+            //peek neightbours in path to check neighbours in array
             if (m_path.Peek().y < m_mazeHeight - 1)
             {
                 if (!m_maze[(int)m_path.Peek().x + 0, (int)m_path.Peek().y + 1].m_visited)
                 {
+                    //add unvisited neighbour to list
                     neighbours.Add('N');
                 }
             }
@@ -111,6 +132,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 if(!m_maze[(int)m_path.Peek().x + 1, (int)m_path.Peek().y + 0].m_visited)
                 {
+                    //add unvisited neighbour to list
                     neighbours.Add('E');
                 }
             }
@@ -119,6 +141,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 if (!m_maze[(int)m_path.Peek().x + 0, (int)m_path.Peek().y + -1].m_visited)
                 {
+                    //add unvisited neighbour to list
                     neighbours.Add('S');
                 }
             }
@@ -127,6 +150,7 @@ public class MazeGenerator : MonoBehaviour
             {
                 if (!m_maze[(int)m_path.Peek().x + -1, (int)m_path.Peek().y + 0].m_visited)
                 {
+                    //add unvisited neighbour to list
                     neighbours.Add('W');
                 }
             }
@@ -134,9 +158,13 @@ public class MazeGenerator : MonoBehaviour
             //No non-visited Neightbours
             if (neighbours.Count != 0)
             {
+                //get rnd neighbour
                 char dir = neighbours[Random.Range(0, neighbours.Count)];
                 switch (dir)
                 {
+                    //for rnd direction
+                    //set value of this and neightbour to not show wall
+                    //push new position (visited neighbour) to stack
                     case 'N':
                         m_maze[(int)m_path.Peek().x, (int)m_path.Peek().y].m_northPath = true;
                         m_maze[(int)m_path.Peek().x + 0, (int)m_path.Peek().y + 1].m_southPath = true;
@@ -161,12 +189,14 @@ public class MazeGenerator : MonoBehaviour
                         Debug.LogError("Unknown Direction");
                         break;
                 }
-
+                //set new position to true
                 m_maze[(int)m_path.Peek().x, (int)m_path.Peek().y].m_visited = true;
+                //up visited count
                 m_visitedCount++;
             }
             else
             {
+                //no more neightbours, pop the stack until has new neighbour 
                 m_path.Pop();
             }
         }
@@ -174,21 +204,31 @@ public class MazeGenerator : MonoBehaviour
 
     void UpdateVisuals(int a_x, int a_y)
     {
+        //with maze
         if (a_x >= 0 && a_x < m_mazeWidth && a_y >= 0 && a_y < m_mazeHeight)
         {
+            //destroy existing tile
             Destroy(m_mazeVisuals[a_x, a_y].m_tile);
+            //set array value to null
             m_mazeVisuals[a_x, a_y].m_tile = null;
 
+            //for each wall
             for (int i = 0; i < m_mazeVisuals[a_x, a_y].m_walls.Length; i++)
             {
+                //destroy existing tile
                 Destroy(m_mazeVisuals[a_x, a_y].m_walls[i]);
+                //set array value to null
                 m_mazeVisuals[a_x, a_y].m_walls[i] = null;
             }
 
+            //instantiate new gameobject
             m_mazeVisuals[a_x, a_y].m_tile = Instantiate(m_tilePrefab, new Vector3(a_x, 0, a_y), Quaternion.identity);
+            //assign sahder values
             m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetFloat("_Width", m_mazeWidth);
             m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetFloat("_Height", m_mazeHeight);
+            //set parent
             m_mazeVisuals[a_x, a_y].m_tile.transform.parent = this.gameObject.transform;
+            //set colour (mainly for update/ debugging)
             if (m_maze[a_x, a_y].m_visited)
             {
                 m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.white);
@@ -198,6 +238,10 @@ public class MazeGenerator : MonoBehaviour
                 m_mazeVisuals[a_x, a_y].m_tile.GetComponent<Renderer>().material.SetColor("_BaseColour", Color.blue);
             }
 
+            //check what neightbours the tile has
+            //add walls to tiles that do no have a path going there
+            //also check if not on maze boarder
+            //assign values for wall's shaders
             if (!m_maze[a_x, a_y].m_northPath || a_y == m_mazeHeight)
             {
                 m_mazeVisuals[a_x, a_y].m_walls[0] = Instantiate(m_wallPrefab, new Vector3(a_x, 0.5f, a_y), Quaternion.identity);
@@ -240,10 +284,12 @@ public class MazeGenerator : MonoBehaviour
 
     void AjustCamera(int a_lowestX, int a_highestX, int a_lowestY, int a_highestY)
     {
+        //adds a bit of border
         int ensureBorder = 2;
-
+        //centre camera
         Camera.main.transform.position = new Vector3(m_mazeWidth / 2, 5, m_mazeHeight / 2);
 
+        //set points the the camera needs to encapulate
         float lowestXViewportPoint = Camera.main.WorldToViewportPoint(new Vector3(a_lowestX - ensureBorder, 0, 0)).x;
         float highestXViewportPoint = Camera.main.WorldToViewportPoint(new Vector3(a_highestX + ensureBorder, 0, 0)).x;
         float lowestYViewportPoint = Camera.main.WorldToViewportPoint(new Vector3(0, 0, a_lowestY - ensureBorder)).y;
@@ -252,6 +298,7 @@ public class MazeGenerator : MonoBehaviour
         // While the highest & lowest x and y viewport point is not between 0 and 1, increase orthographicSize
         while (highestXViewportPoint > 1 || lowestXViewportPoint < 0 || highestYViewportPoint > 1 || lowestYViewportPoint < 0)
         {
+            //up orthographic viewing untill all points are in camera view
             Camera.main.orthographicSize += 1;
             lowestXViewportPoint = Camera.main.WorldToViewportPoint(new Vector3(a_lowestX - ensureBorder, 0, 0)).x;
             highestXViewportPoint = Camera.main.WorldToViewportPoint(new Vector3(a_highestX + ensureBorder, 0, 0)).x;
@@ -261,6 +308,7 @@ public class MazeGenerator : MonoBehaviour
     }
 }
 
+//info for each cell
 public class Cell
 {
     //Public Variables
@@ -270,6 +318,7 @@ public class Cell
     public bool m_southPath = false;
     public bool m_westPath = false;
 }
+//info for each cell's visuals
 public class CellVisuals
 {
     //Public Variables

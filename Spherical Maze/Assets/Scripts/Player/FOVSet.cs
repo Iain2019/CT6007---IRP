@@ -9,6 +9,7 @@ public class FOVSet : MonoBehaviour
     {
         if (PersistentInfo.Instance != null)
         {
+            //get fox from pi and set
             Camera.main.fieldOfView = PersistentInfo.Instance.m_FOV;
         }
     }

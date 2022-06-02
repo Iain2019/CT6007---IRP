@@ -25,6 +25,8 @@ public class UISet : MonoBehaviour
     {
         switch(m_type)
         {
+            //switch on type of ui
+            //Set assigned values for different in menu UI elements 
             case TYPE.SOUND:
                 GetComponent<UnityEngine.UI.Slider>().value = PersistentInfo.Instance.m_Sound;
                 break;
